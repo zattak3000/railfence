@@ -13,11 +13,17 @@
 
 void encode(char *cipher, char *plaintext, int key)
 {
-    char fence[10][50];
-    char idx[10] = {};
-
-    char output[100];
     int len = strlen(plaintext);
+
+    char fence[key][len / 2];
+    char idx[key];
+
+    for (int i = 0; i < key; i++) 
+    {
+        idx[i] = 0;
+    }
+    
+    char output[len];
 
     int i = 0;
     char r = 0;
