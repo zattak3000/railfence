@@ -9,21 +9,27 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 
 void encode(char *cipher, char *plaintext, int key)
 {
     int len = strlen(plaintext);
 
-    char fence[key][len / 2];
-    char idx[key];
+    char **fence = (char**) malloc(sizeof(char*) * key);
+    for (int i = 0; i < key; i++)
+    {
+        fence[i] = (char*) malloc(sizeof(char) * (len / 2));
+    }
+    
+    char *idx = (char*) malloc(sizeof(char) * key);
 
     for (int i = 0; i < key; i++) 
     {
         idx[i] = 0;
     }
     
-    char output[len];
+    char *output = malloc(sizeof(char) * len);
 
     int i = 0;
     char r = 0;
@@ -68,6 +74,15 @@ void encode(char *cipher, char *plaintext, int key)
     output[outidx] = '\0';
 
     strcpy(cipher, output);
+
+    for (int i = 0; i < key; i++)
+    {
+        free(fence[i]);
+    }
+
+    free(fence);
+    free(idx);
+    free(output);
 }
 
 void decode(char *plaintext, char *cipher, int key)
