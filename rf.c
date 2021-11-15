@@ -23,44 +23,27 @@ void encode(char *cipher, char *plaintext, int key)
     }
     
     char *idx = (char*) malloc(sizeof(char) * key);
-
     for (int i = 0; i < key; i++) 
     {
         idx[i] = 0;
     }
     
-    char *output = malloc(sizeof(char) * len);
-
-    int i = 0;
     char r = 0;
-    
-    while (i < len)
-    {   
-        for (; r < key; r++)
+    char up = 1;
+
+    for (int i = 0; i < len; i++)
+    {
+        fence[r][idx[r]++] = plaintext[i];
+
+        r += up ? 1 : -1;
+
+        if (r == 0 || r == (key - 1))
         {
-            if (i >= len)
-            {
-                i = len + 1;
-                break;
-            }
-
-            fence[r][idx[r]++] = plaintext[i++];
+            up = !up;
         }
-        r -= 2;
-
-        for (; r >= 0; r--)
-        {
-            if (i >= len) 
-            {
-                i = len + 1;
-                break;
-            }
-
-            fence[r][idx[r]++] = plaintext[i++];
-        }
-        r += 2;
     }
 
+    char *output = malloc(sizeof(char) * len);
     char outidx = 0;
 
     for (int i = 0; i < key; i++)
@@ -110,4 +93,7 @@ int main(int argc, char const *argv[])
     char output[50];
     encode(output, plaintext, key);
     printf("Encrypted with key %d: %s\n", key, output);
+
+    decode(output, output, key);
+    printf("Decrypted with key %d: %s\n", key, output);
 }
