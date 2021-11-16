@@ -90,7 +90,76 @@ void encode(char *cipher, char *plaintext, int key)
 //
 void decode(char *plaintext, char *cipher, int key)
 {
-    // Not quite there yet...
+    int len = strlen(cipher);
+
+    char *idx = (char*) malloc(sizeof(char) * key);
+
+    for (int i = 0; i < key; i++) 
+    {
+        idx[i] = 0;
+    }
+
+    char r = 0;
+    char up = 1;
+
+    for (int i = 0; i < len; i++)
+    {
+        idx[r] += 1;
+
+        r += up ? 1 : -1;
+
+        if (r == 0 || r == (key - 1))
+        {
+            up = !up;
+        }
+    }
+
+    int pos = 0;
+
+    char **fence = (char**) malloc(sizeof(char*) * key);
+
+    for (int i = 0; i < key; i++)
+    {
+        fence[i] = (char*) malloc(sizeof(char) * idx[i]);
+
+        for (int j = 0; j < idx[i]; j++)
+        {
+            fence[i][j] = cipher[pos++];
+        }
+    }
+
+    pos = 0;
+    r = 0;
+    up = 1;
+
+    for (int i = 0; i < key; i++) 
+    {
+        idx[i] = 0;
+    }
+
+    char *output = malloc(sizeof(char) * len);
+
+    for (int i = 0; i < len; i++)
+    {
+        output[pos++] = fence[r][idx[r]++];
+
+        r += up ? 1 : -1;
+
+        if (r == 0 || r == (key - 1))
+        {
+            up = !up;
+        }
+    }
+
+    strcpy(plaintext, output);
+
+    for (int i = 0; i < key; i++)
+    {
+        free(fence[i]); 
+    }
+    free(fence);
+    free(idx);
+    free(output);
 }
 
 int main(int argc, char const *argv[])
@@ -120,4 +189,8 @@ int main(int argc, char const *argv[])
     // Encode plaintext and print to screen
     encode(output, plaintext, key);
     printf("Encrypted with key %d: %s\n", key, output);
+    
+    char output2[50];
+    decode(output2, output, key);
+    printf("Decrypted with key %d: %s\n", key, output2);
 }
