@@ -89,4 +89,43 @@ e y e r t e t . . . . . . .
 ```
 ### Decoding
 ---
-Still working on that
+The nice thing about decoding is that you can create a [jagged array](https://en.wikipedia.org/wiki/Jagged_array) by iterating through the zig zag function for each letter in the ciphertext and counting how many times each rail is passed through, instead of generating a true zig zag shape. This allows us to allocate the exact amount needed for each rail.  
+(Notice how the array below has the same number of 0s on each line as [the one above](#decoding))
+
+`Ciphertext: vsexeyertetrct`  
+`Key: 3`
+```
+0 0 0 0
+0 0 0 0 0 0 0
+0 0 0
+```
+The subsequent amount of letters from the ciphertext can then be inserted into each rail before zig zagging through the rails again to generate the plaintext
+```
+[vsex]eyertetrct
+v s e x       <==
+0 0 0 0 0 0 0
+0 0 0
+
+vsex[eyertet]rct
+v s e x
+e y e r t e t <==
+0 0 0
+
+vsexeyertet[rct]
+v s e x
+e y e r t e t
+r c t         <==
+```
+Now I know it might not look like plaintext, but we are one step away from obtaining it.
+
+Now that all the rails are filled, the last step is to perform a zig-zag between them one letter at a time to get the plaintext. By counting the number of times you pass each rail, you can generate a sort of index counter so you know which space to access next in the rail. So, the first time you pass the first rail you get the letter at index 0, the next time you get the letter at index 1 and so on.
+
+It is a little hard to visualize, but try drawing a line over the array below over each letter in alphabetical order. Notice how it still forms a zig zag without missing any spaces.
+
+`Plaintext: abcdefghijklmnop`  
+`Key: 3`
+```
+A E I M
+B D F H J L N P
+C G K O
+```
